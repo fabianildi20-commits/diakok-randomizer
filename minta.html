@@ -1,0 +1,49 @@
+
+.html
+<!doctype html>
+      renderGroups(groups);
+    });
+
+    $('clearBtn').addEventListener('click', ()=>{
+      if(!confirm('Biztosan törlöd a mezőt?')) return;
+      $('names').value=''; $('result').innerHTML=''; updateCount(); localStorage.removeItem('diakok_names');
+    });
+
+    $('copyBtn').addEventListener('click', async ()=>{
+      const names = getNames();
+      if(!names.length) return alert('Nincsenek nevek.');
+      try{ await navigator.clipboard.writeText(names.join('\n')); alert('Másolva a vágólapra.'); } catch(e){ alert('A böngésződ nem engedélyezte a vágólapot.'); }
+    });
+
+    $('downloadBtn').addEventListener('click', ()=>{
+      const names = getNames();
+      if(!names.length) return alert('Nincsenek nevek.');
+      const blob = new Blob([names.join('\n')], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'diakok.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    $('saveBtn').addEventListener('click', ()=>{
+      localStorage.setItem('diakok_names', $('names').value);
+      alert('Mentve a böngészőbe.');
+    });
+
+    // Persist/load
+    window.addEventListener('load', ()=>{
+      const saved = localStorage.getItem('diakok_names'); if(saved) $('names').value = saved;
+      updateCount();
+      // initial render if any
+      const names = getNames(); if(names.length) renderList(names);
+    });
+
+    // keyboard shortcut: Ctrl+Enter -> shuffle
+    window.addEventListener('keydown',(e)=>{
+      if((e.ctrlKey||e.metaKey) && e.key==='Enter'){
+        e.preventDefault(); $('shuffleBtn').click();
+      }
+    });
+
+  </script>
+</body>
+</html>
+
